@@ -14,6 +14,8 @@ class VideoModel {
       poster: updates.poster ?? poster,
     );
   }
+
+
 }
 
 class VideoDetail extends VideoModel {
@@ -47,3 +49,30 @@ class VideoDetail extends VideoModel {
         poster: updates.poster ?? poster,
       );
 }
+
+extension VideoModelExt on VideoModel{
+  VideoModel copyWith(VideoModel updates) {
+    return VideoModel(
+      title: updates.title ?? title,
+      year: updates.year ?? year,
+      id: updates.id ?? id,
+      poster: updates.poster ?? poster,
+    );
+  }
+
+}
+
+extension VideoDetailExt on VideoDetail{
+  VideoDetail copyWith(VideoDetail updates) => VideoDetail(
+        label: updates.label ?? label,
+        priority: updates.priority ?? priority,
+        viewed: updates.viewed ?? viewed,
+        rating: updates.rating ?? rating,
+        timestamp: updates.timestamp ?? timestamp,
+        title: updates.title ?? title,
+        year: updates.year ?? year,
+        id: updates.id ?? id,
+        poster: updates.poster ?? poster,
+      );
+}
+
