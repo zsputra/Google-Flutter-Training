@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:demo_app/routes/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -8,6 +10,9 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+  String _token ;
+  bool _check = false;
   startTime() async {
     var _duration = new Duration(seconds: 2);
     return new Timer(_duration, navigationPage);
@@ -16,11 +21,24 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    checkToken();
     startTime();
   }
 
-  void navigationPage() {
-    Navigator.of(context).pushReplacementNamed('/LoginPage');
+  Future<void> navigationPage() async {
+    
+    
+    
+    Navigator.of(context).pushReplacementNamed(_token == null ?Routes.login :Routes.home);
+ 
+    
+  }
+
+  Future<void> checkToken() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    setState(() {
+      _token = sharedPreferences.getString("token");
+    });
   }
 
   @override

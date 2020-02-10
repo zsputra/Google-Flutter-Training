@@ -1,12 +1,13 @@
 
-import 'package:demo_app/pages/home_page.dart';
-import 'package:demo_app/pages/login_page.dart';
 import 'package:demo_app/pages/splash_page.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:demo_app/routes/router.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 void main() {
   runApp(HomePage());
+
 }
 
 class HomePage extends StatelessWidget {
@@ -18,13 +19,7 @@ class HomePage extends StatelessWidget {
       ),
       title: 'my app',
       home: SplashScreen(),
-      routes: <String, WidgetBuilder>{
-        '/HomeScreen': (BuildContext context) =>  MyHomePage(),
-        '/LoginPage' : (BuildContext context) => LoginPage(),
-      },
+      routes: Router.routes,
     );
   }
 }
-
-
-
