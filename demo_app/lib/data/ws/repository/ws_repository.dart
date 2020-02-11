@@ -1,11 +1,11 @@
-import 'package:demo_app/data/omdb/models/movies.dart';
 import 'package:demo_app/data/ws/datasources/ws_remote_datasource.dart';
+import 'package:demo_app/data/ws/models/ws_movie_model.dart';
 import 'package:flutter/cupertino.dart';
 
 abstract class WsRepository{
-  Future<List<MovieDetail>> getAllMovies();
-  Future<MovieDetail> getAllMoviesRecomendation();
-  Future<void> likeMovie(MovieDetail movie);
+  Future<List<WsMovieModel>> getAllMovies();
+  Future<WsMovieModel> getAllMoviesRecomendation();
+  Future<void> likeMovie(WsMovieModel movie);
   Future<String> getJsons();
 }
 
@@ -17,7 +17,7 @@ class WsRepositoryImpl implements WsRepository{
 
  
   @override
-  Future<List<MovieDetail>> getAllMovies() {
+  Future<List<WsMovieModel>> getAllMovies() {
     return datasource.getAllMovies();
   }
 
@@ -27,12 +27,12 @@ class WsRepositoryImpl implements WsRepository{
   }
 
   @override
-  Future<MovieDetail> getAllMoviesRecomendation() {
+  Future<WsMovieModel> getAllMoviesRecomendation() {
     return datasource.getAllMoviesRecomendation();
   }
 
   @override
-  Future<void> likeMovie(MovieDetail movie) {
+  Future<void> likeMovie(WsMovieModel movie) {
     return datasource.postMovie(movie);
   }
 

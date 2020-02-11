@@ -1,8 +1,8 @@
-import 'package:demo_app/data/omdb/models/movies.dart';
+import 'package:demo_app/domain/entities/movies.dart';
 import 'package:flutter/material.dart';
 
 class ListMovies extends StatelessWidget {
-  final List<MovieDetail> datas;
+  final List<Movie> datas;
 
   final Function _addMovie;
 

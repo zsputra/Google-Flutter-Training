@@ -1,17 +1,15 @@
-import 'package:demo_app/data/omdb/models/movies.dart';
-import 'package:demo_app/pages/dashboard_page.dart';
-import 'package:demo_app/pages/favorite_page.dart';
-import 'package:demo_app/pages/home_page.dart';
-import 'package:demo_app/pages/login_page.dart';
-import 'package:demo_app/pages/search_page.dart';
-import 'package:demo_app/pages/setting_page.dart';
-import 'package:demo_app/pages/splash_page.dart';
-import 'package:demo_app/routes/routes.dart';
+import 'package:demo_app/common/routes/routes.dart';
+import 'package:demo_app/pages/dashboard/page/dashboard_page.dart';
+import 'package:demo_app/pages/favorite_movies/page/favorite_page.dart';
+import 'package:demo_app/pages/home/page/home_page.dart';
+import 'package:demo_app/pages/login/page/login_page.dart';
+import 'package:demo_app/pages/search/page/search_page.dart';
+import 'package:demo_app/pages/setting/page/setting_page.dart';
+import 'package:demo_app/pages/splash/page/splash_page.dart';
 import 'package:flutter/material.dart';
 
 
 abstract class Router {
-  static List<MovieDetail> lists;
   static Map<String, WidgetBuilder> routes = {
     Routes.splash: (BuildContext context) => SplashScreen(),
     Routes.login: (BuildContext context) => LoginPage(),

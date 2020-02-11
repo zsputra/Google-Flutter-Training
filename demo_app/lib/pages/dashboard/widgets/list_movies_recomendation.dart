@@ -1,9 +1,10 @@
-import 'package:demo_app/data/omdb/models/movies.dart';
+import 'package:demo_app/data/ws/models/ws_movie_model.dart';
+import 'package:demo_app/domain/entities/movies.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ListMoviesRecomendation extends StatelessWidget {
-  final List<MovieDetail> _recomendedMovies;
+  final List<WsMovieModel> _recomendedMovies;
   // final List<MovieDetail> _listAllMovies;
 
   ListMoviesRecomendation(this._recomendedMovies);

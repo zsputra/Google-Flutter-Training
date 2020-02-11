@@ -1,9 +1,11 @@
+import 'package:demo_app/common/network/network_utils.dart';
 import 'package:demo_app/data/omdb/datasources/omdb_remote_datasource.dart';
-import 'package:demo_app/data/omdb/models/movies.dart';
 import 'package:demo_app/data/omdb/repository/omdb_repository.dart';
 import 'package:demo_app/data/ws/datasources/ws_remote_datasource.dart';
+import 'package:demo_app/data/ws/models/ws_movie_model.dart';
+import 'package:demo_app/domain/entities/movies.dart';
 import 'package:demo_app/network/omdb_movie_client.dart';
-import 'package:demo_app/widgets/list_movies_recomendation.dart';
+import 'package:demo_app/pages/dashboard/widgets/list_movies_recomendation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
@@ -15,8 +17,8 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageImpl extends State<DashboardPage> {
-  List<MovieDetail> _listMovies = new List<MovieDetail>();
-  MovieDetail _listMoviesRecomendation = MovieDetail();
+  List<Movie> _listMovies = new List<Movie>();
+  WsMovieModel _listMoviesRecomendation = WsMovieModel();
   String _title ;
   String _year;
 
@@ -27,7 +29,7 @@ class _DashboardPageImpl extends State<DashboardPage> {
   TextEditingController controller = TextEditingController();
   Future<OmdbRepository> get omdbRepository async => OmdbRepositoryImpl(
         datasource: OmdbMovieRemoteDatasourceImpl(
-          client: OmdbWsClientImpl(Client()),
+          client: OmdbWsClientImpl(defaultHttp),
         ),
         
       );
@@ -71,10 +73,10 @@ class _DashboardPageImpl extends State<DashboardPage> {
     return FutureBuilder(
                 future: wsMovieRDS.getAllMoviesRecomendation(),
                 builder: (BuildContext context,
-                    AsyncSnapshot<MovieDetail> snapshot) {
+                    AsyncSnapshot<WsMovieModel> snapshot) {
                   if (snapshot.connectionState == ConnectionState.done &&
                       !snapshot.hasError) {
-                        List<MovieDetail> lis = List<MovieDetail>();
+                        List<WsMovieModel> lis = List<WsMovieModel>();
                     _listMoviesRecomendation = snapshot.data;
                     lis.add(_listMoviesRecomendation);
                     return ListMoviesRecomendation(lis);

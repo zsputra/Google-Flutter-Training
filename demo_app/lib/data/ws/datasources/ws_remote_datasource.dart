@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:demo_app/data/omdb/models/movies.dart';
+import 'package:demo_app/common/network/network_utils.dart';
+import 'package:demo_app/data/ws/models/ws_movie_model.dart';
 import 'package:demo_app/network/omdb_movie_client.dart';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
@@ -7,28 +8,29 @@ import 'package:meta/meta.dart';
 import 'package:http/http.dart' as http;
 
 abstract class WsMovieRemoteDatasource {
-  Future<List<MovieDetail>> getAllMovies();
-  Future<MovieDetail> getAllMoviesRecomendation();
-  Future<Response> postMovie(MovieDetail movie);
+  Future<List<WsMovieModel>> getAllMovies();
+  Future<WsMovieModel> getAllMoviesRecomendation();
+  Future<Response> postMovie(WsMovieModel movie);
   
   Future<String> getJsonBody();
 }
 
 class WsMovieRemoteDatasourceImpl implements WsMovieRemoteDatasource {
   final OmdbWsClient client;
+  final String _host = "demo-video-ws-chfmsoli4q-ew.a.run.app";
 
   WsMovieRemoteDatasourceImpl({@required this.client});
 
   factory WsMovieRemoteDatasourceImpl.create() {
     return WsMovieRemoteDatasourceImpl(
-      client: OmdbWsClientImpl(http.Client()),
+      client: OmdbWsClientImpl(defaultHttp),
     );
   }
 
     
 
   @override
-  Future<List<MovieDetail>> getAllMovies() async {
+  Future<List<WsMovieModel>> getAllMovies() async {
     String token = "zainudin.saputra@dkatalis.com";
     String uri =
         "https://demo-video-ws-chfmsoli4q-ew.a.run.app/video-ws/videos";
@@ -38,16 +40,16 @@ class WsMovieRemoteDatasourceImpl implements WsMovieRemoteDatasource {
     };
     final response = await client.get(uri, headers: headers);
     String json = response.body;
-    List<MovieDetail> movieList = List<MovieDetail>();
+    List<WsMovieModel> movieList = List<WsMovieModel>();
     List<dynamic> decodedRaw = jsonDecode(json);
     decodedRaw.forEach((x) {
-      movieList.add(MovieDetail.fromWsJson(x));
+      movieList.add(WsMovieModel.fromWsJson(x));
     });
     return movieList;
   }
 
   @override
-  Future<MovieDetail> getAllMoviesRecomendation() async {
+  Future<WsMovieModel> getAllMoviesRecomendation() async {
     String token = "zainudin.saputra@dkatalis.com";
     String uri =
         "https://demo-video-ws-chfmsoli4q-ew.a.run.app/video-ws/recommended";
@@ -57,25 +59,33 @@ class WsMovieRemoteDatasourceImpl implements WsMovieRemoteDatasource {
     };
     final response = await client.get(uri, headers: headers);
     String json = response.body;
-    MovieDetail movieList = MovieDetail();
+    WsMovieModel movieList = WsMovieModel();
     Map<String, dynamic> decodedRaw = jsonDecode(json);
-    movieList =  MovieDetail.fromWsJson(decodedRaw);
+    movieList =  WsMovieModel.fromWsJson(decodedRaw);
     return movieList;
   }
 
   @override
-  Future<Response> postMovie(MovieDetail movie) async {
+  Future<Response> postMovie(WsMovieModel movie) async {
     String token = "zainudin.saputra@dkatalis.com";
     String uri =
         "https://demo-video-ws-chfmsoli4q-ew.a.run.app/video-ws/videos";
+      Uri uri1 = Uri.https(_host, "/video-ws/videos",
+      );
+    assert(uri == uri1.toString());
     Map<String, String> headers = {
-      'token': token,
+      'token': 'zainudin.saputra@dkatalis.com',
       'Content-Type': 'application/json'
     };
-    MovieDetail movies = MovieDetail(id: "1", title: "Berenang", label: "label", priority: 1, poster: "poster", rating: 10, timestamp: 12331, viewed: true, year: "2020");
-    var json = jsonEncode(movies.toJson());
+    WsMovieModel _movies = WsMovieModel(id: "1", title: "Berenang", label: "label", priority: 1, poster: "poster", rating: 10, timestamp: 12331, viewed: true, year: "2020");
+
+    final _json = '''
+      {"label":"label","priority":1,"viewed":true,"rating":10,"timestamp":12331,"title":"Berenang","year":"2020","id":"1","poster":"poster"}
+    ''';
+    
+    var json = jsonEncode(_movies.toJson());
     // print(json);
-    Response response =  await client.post(uri, headers: headers, body: json);
+    Response response =  await http.post(uri, headers: headers, body: _json, encoding: Encoding.getByName("utf-8"));
     print(response.body);
     return response; 
     

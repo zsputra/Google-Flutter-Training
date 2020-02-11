@@ -1,0 +1,18 @@
+Testing:
+
+1. we have to import the package
+2. make a test class under the test folder
+3. we can put our json in the test folder for testing purpose
+4. using test("") function, isA function is to check whether an object is an instace of a class or not
+5. if there is a dependent class, we have to mock the dependency by using extends Mock and implements the class that we want to mock.
+6. we can use setUp function to set up the things that we need for the test, before running the test
+7. when and then function is the same as in java.
+8. we can also use verify() funtion just like in java.
+9. group() function is for grouping tests with certain behaviour.
+
+10. for testing BLoC we can use bloc_flutter package
+11. testing for BloC is just testing the behaviour of event we put on the block and the output of the event
+12. the defintion in the blocTest("defintion") is testing the state and expect some flow of the bloc. 'should emit ........ event1, even2,..'
+13 in blocTest() there is a build() function, that is to return the black object.
+14 act() is a function with parameter bloc. what are we going todo with the bloc.
+

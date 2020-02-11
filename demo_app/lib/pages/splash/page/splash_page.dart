@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:demo_app/routes/routes.dart';
+import 'package:demo_app/common/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

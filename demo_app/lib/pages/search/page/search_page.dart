@@ -1,9 +1,11 @@
+import 'package:demo_app/common/network/network_utils.dart';
 import 'package:demo_app/data/omdb/datasources/omdb_remote_datasource.dart';
-import 'package:demo_app/data/omdb/models/movies.dart';
 import 'package:demo_app/data/omdb/repository/omdb_repository.dart';
 import 'package:demo_app/data/ws/datasources/ws_remote_datasource.dart';
+import 'package:demo_app/data/ws/models/ws_movie_model.dart';
+import 'package:demo_app/domain/entities/movies.dart';
 import 'package:demo_app/network/omdb_movie_client.dart';
-import 'package:demo_app/widgets/list_movies.dart';
+import 'package:demo_app/pages/search/widgets/list_movies.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
@@ -15,7 +17,7 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageImpl extends State<SearchPage> {
-  List<MovieDetail> _listMovies = new List<MovieDetail>();
+  List<Movie> _listMovies = new List<Movie>();
   String _title;
   String _year;
   WsMovieRemoteDatasourceImpl get wsMovieRDS =>
@@ -25,13 +27,13 @@ class _SearchPageImpl extends State<SearchPage> {
       
   OmdbMovieRemoteDatasource get nasaAsteroidRDS =>
       OmdbMovieRemoteDatasourceImpl(
-        client: OmdbWsClientImpl(Client()),
+        client: OmdbWsClientImpl(defaultHttp),
       );
 
   TextEditingController controller = TextEditingController();
   Future<OmdbRepository> get omdbRepository async => OmdbRepositoryImpl(
         datasource: OmdbMovieRemoteDatasourceImpl(
-          client: OmdbWsClientImpl(Client()),
+          client: OmdbWsClientImpl(defaultHttp),
         ),
       );
 
@@ -81,10 +83,11 @@ class _SearchPageImpl extends State<SearchPage> {
     });
   }
 
-  void _addToMovieList(MovieDetail movieDetail)async {
+  void _addToMovieList(Movie movieDetail)async {
     final repository = wsMovieRDS;
     setState(()  {
-      repository.postMovie(movieDetail);
+      WsMovieModel wsMovieModel = new WsMovieModel(id: movieDetail.id, poster: movieDetail.poster, year: movieDetail.year, title: movieDetail.title, type: movieDetail.type);
+      repository.postMovie(wsMovieModel);
     });
   }
 
@@ -170,7 +173,7 @@ class _SearchPageImpl extends State<SearchPage> {
               child: FutureBuilder(
                 future: nasaAsteroidRDS.getMoviesByTitle(_title, _year),
                 builder: (BuildContext context,
-                    AsyncSnapshot<List<MovieDetail>> snapshot) {
+                    AsyncSnapshot<List<Movie>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.done &&
                       !snapshot.hasError) {
                     _listMovies = snapshot.data;

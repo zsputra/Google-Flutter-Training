@@ -1,8 +1,8 @@
 
-import 'package:demo_app/pages/splash_page.dart';
-import 'package:demo_app/routes/router.dart';
+import 'package:demo_app/pages/splash/page/splash_page.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'common/routes/router.dart';
 
 
 void main() {
