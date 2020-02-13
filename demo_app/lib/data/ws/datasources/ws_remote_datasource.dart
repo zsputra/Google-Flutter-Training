@@ -1,20 +1,27 @@
 import 'dart:convert';
 import 'package:demo_app/common/network/network_utils.dart';
+import 'package:demo_app/common/network2/omdb_movie_client.dart';
 import 'package:demo_app/data/ws/models/ws_movie_model.dart';
-import 'package:demo_app/network/omdb_movie_client.dart';
+import 'package:demo_app/domain/entities/movies.dart';
 import 'package:http/http.dart';
+import 'package:injectable/injectable.dart';
 import 'package:meta/meta.dart';
 
 import 'package:http/http.dart' as http;
 
+@Bind.toType(WsMovieRemoteDatasourceImpl)
+@injectable
 abstract class WsMovieRemoteDatasource {
   Future<List<WsMovieModel>> getAllMovies();
   Future<WsMovieModel> getAllMoviesRecomendation();
   Future<Response> postMovie(WsMovieModel movie);
-  
-  Future<String> getJsonBody();
+  Future<Response> updateMovieById(WsMovieModel movie);
+  Future<Response> deleteMovieById(String id);
+
 }
 
+@lazySingleton
+@injectable
 class WsMovieRemoteDatasourceImpl implements WsMovieRemoteDatasource {
   final OmdbWsClient client;
   final String _host = "demo-video-ws-chfmsoli4q-ew.a.run.app";
@@ -27,11 +34,9 @@ class WsMovieRemoteDatasourceImpl implements WsMovieRemoteDatasource {
     );
   }
 
-    
-
   @override
   Future<List<WsMovieModel>> getAllMovies() async {
-    String token = "zainudin.saputra@dkatalis.com";
+    String token = "putra";
     String uri =
         "https://demo-video-ws-chfmsoli4q-ew.a.run.app/video-ws/videos";
     Map<String, String> headers = {
@@ -50,7 +55,7 @@ class WsMovieRemoteDatasourceImpl implements WsMovieRemoteDatasource {
 
   @override
   Future<WsMovieModel> getAllMoviesRecomendation() async {
-    String token = "zainudin.saputra@dkatalis.com";
+    String token = "putra";
     String uri =
         "https://demo-video-ws-chfmsoli4q-ew.a.run.app/video-ws/recommended";
     Map<String, String> headers = {
@@ -61,48 +66,65 @@ class WsMovieRemoteDatasourceImpl implements WsMovieRemoteDatasource {
     String json = response.body;
     WsMovieModel movieList = WsMovieModel();
     Map<String, dynamic> decodedRaw = jsonDecode(json);
-    movieList =  WsMovieModel.fromWsJson(decodedRaw);
+    movieList = WsMovieModel.fromWsJson(decodedRaw);
     return movieList;
   }
 
   @override
   Future<Response> postMovie(WsMovieModel movie) async {
-    String token = "zainudin.saputra@dkatalis.com";
+    String token = "putra";
     String uri =
-        "https://demo-video-ws-chfmsoli4q-ew.a.run.app/video-ws/videos";
-      Uri uri1 = Uri.https(_host, "/video-ws/videos",
-      );
-    assert(uri == uri1.toString());
+        "https://demo-video-ws-chfmsoli4q-ew.a.run.app/video-ws/videos/";
+
     Map<String, String> headers = {
-      'token': 'zainudin.saputra@dkatalis.com',
+      'token': token,
       'Content-Type': 'application/json'
     };
-    WsMovieModel _movies = WsMovieModel(id: "1", title: "Berenang", label: "label", priority: 1, poster: "poster", rating: 10, timestamp: 12331, viewed: true, year: "2020");
 
-    final _json = '''
-      {"label":"label","priority":1,"viewed":true,"rating":10,"timestamp":12331,"title":"Berenang","year":"2020","id":"1","poster":"poster"}
-    ''';
-    
-    var json = jsonEncode(_movies.toJson());
-    // print(json);
-    Response response =  await http.post(uri, headers: headers, body: _json, encoding: Encoding.getByName("utf-8"));
-    print(response.body);
-    return response; 
-    
+    var json = jsonEncode(movie.toJson());
+    Response response = await client.post(
+      uri,
+      headers: headers,
+      body: json,
+    ); //encoding: Encoding.getByName("utf-8"));
+    return response;
+  }
+
+
+
+  @override
+  Future<Response> updateMovieById(WsMovieModel movie) async {
+    String token = "putra";
+    String uri =
+        "https://demo-video-ws-chfmsoli4q-ew.a.run.app/video-ws/videos/${movie.id}";
+
+    Map<String, String> headers = {
+      'token': token,
+      'Content-Type': 'application/json'
+    };
+    var json = jsonEncode(movie.toJson());
+    Response response = await client.put(
+      uri,
+      headers: headers,
+      body: json,
+    );
+    return response;
   }
 
   @override
-  Future<String> getJsonBody() async {
-     String apikey = "f73eb4d2";
-    String uri = "http://www.omdbapi.com/?s=Putra&apikey=$apikey";
-    final response = await client.get(uri);
-    String json = response.body;
-    return json;
+  Future<Response> deleteMovieById(String id) async {
+    String token = "putra";
+    String uri =
+        "https://demo-video-ws-chfmsoli4q-ew.a.run.app/video-ws/videos/$id";
+
+    Map<String, String> headers = {
+      'token': token,
+      'Content-Type': 'application/json'
+    };
+    Response response = await client.delete(
+      uri,
+      headers: headers,
+    );
+    return response;
   }
-
-  
-
-
 }
-
-

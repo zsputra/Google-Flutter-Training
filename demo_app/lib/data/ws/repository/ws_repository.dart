@@ -1,14 +1,22 @@
 import 'package:demo_app/data/ws/datasources/ws_remote_datasource.dart';
 import 'package:demo_app/data/ws/models/ws_movie_model.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
+import 'package:injectable/injectable.dart';
 
+@Bind.toType(WsRepositoryImpl)
+@injectable
 abstract class WsRepository{
   Future<List<WsMovieModel>> getAllMovies();
   Future<WsMovieModel> getAllMoviesRecomendation();
   Future<void> likeMovie(WsMovieModel movie);
-  Future<String> getJsons();
+  Future<Response> updateMovieById(WsMovieModel movie);
+  Future<Response> deleteMovieById(String id);
 }
 
+
+@lazySingleton
+@injectable
 class WsRepositoryImpl implements WsRepository{
   final WsMovieRemoteDatasource datasource ;
   
@@ -21,10 +29,6 @@ class WsRepositoryImpl implements WsRepository{
     return datasource.getAllMovies();
   }
 
-  @override
-  Future<String> getJsons() {
-    return datasource.getJsonBody();
-  }
 
   @override
   Future<WsMovieModel> getAllMoviesRecomendation() {
@@ -34,6 +38,16 @@ class WsRepositoryImpl implements WsRepository{
   @override
   Future<void> likeMovie(WsMovieModel movie) {
     return datasource.postMovie(movie);
+  }
+
+  @override
+  Future<Response> deleteMovieById(String id) {
+    return datasource.deleteMovieById(id);
+  }
+
+  @override
+  Future<Response> updateMovieById(WsMovieModel movie) {
+    return datasource.updateMovieById(movie);
   }
 
 
