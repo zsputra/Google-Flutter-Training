@@ -1,5 +1,3 @@
-
-
 abstract class Routes {
   static const String splash = '/splash';
   static const String login = '/login';
@@ -15,6 +13,8 @@ abstract class Routes {
   static const String settings = '$home/$settingsPath';
   static const String favoriteDetailsPath = 'favoriteDetails';
   static const String favoriteDetails = '/$favoriteDetailsPath';
+  static const String movieEditorPath = 'editMovie';
+  static const String movieEditor = '/$movieEditorPath';
   static const String notFoundPath = 'notFound';
   static const String notFound = '/$notFoundPath';
-} 
+}

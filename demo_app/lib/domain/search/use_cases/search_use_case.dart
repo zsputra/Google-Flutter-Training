@@ -2,6 +2,8 @@ import 'package:demo_app/common/configure/getit_configuration.dart';
 import 'package:demo_app/common/models/use_case.dart';
 import 'package:demo_app/data/omdb/models/omdb_movie_model.dart';
 import 'package:demo_app/data/omdb/repository/omdb_repository.dart';
+import 'package:demo_app/data/ws/models/ws_movie_model.dart';
+import 'package:demo_app/data/ws/repository/ws_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 

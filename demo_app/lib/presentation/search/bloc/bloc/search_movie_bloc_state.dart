@@ -23,3 +23,9 @@ class SearchMovieErrorState extends SearchMovieBlocState {
 
   SearchMovieErrorState(this.error);
 }
+
+@immutable
+class LikeMovieSuccessState extends SearchMovieBlocState {
+  final String message;
+  LikeMovieSuccessState(this.message);
+}

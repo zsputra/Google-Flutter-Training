@@ -14,3 +14,10 @@ class SearchMovieByTitleYear extends SearchMovieBlocEvent {
   final Map map;
   SearchMovieByTitleYear(this.map);
 }
+
+@immutable
+class LikeMovieEvent extends SearchMovieBlocEvent{
+  final OmdbMovieModel movie;
+  LikeMovieEvent(this.movie);
+}
+

@@ -5,9 +5,11 @@ import 'package:demo_app/data/omdb/repository/omdb_repository.dart';
 import 'package:demo_app/data/ws/datasources/ws_remote_datasource.dart';
 import 'package:demo_app/data/ws/models/ws_movie_model.dart';
 import 'package:demo_app/domain/entities/movies.dart';
+import 'package:demo_app/presentation/favorite_movies/bloc/favoritemovies_bloc.dart';
 import 'package:demo_app/presentation/favorite_movies/widgets/list_movies_favorite.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class FavoritePage extends StatefulWidget {
   @override
@@ -37,6 +39,7 @@ class _FavoritePageImpl extends State<FavoritePage> {
   void initState() {
     _getData();
     super.initState();
+    BlocProvider.of<FavoritemoviesBloc>(context).add(GetAllFavoriteMovie());
   }
 
   void _getData() async {
@@ -76,20 +79,37 @@ class _FavoritePageImpl extends State<FavoritePage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: wsMovieRDS.getAllMovies(),
-      builder:
-          (BuildContext context, AsyncSnapshot<List<WsMovieModel>> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            !snapshot.hasError) {
-          // List<WsMovieModel> lis = List<WsMovieModel>();
-          _listMovies = snapshot.data;
-          // lis.add(_listMoviesRecomendation);
+    return BlocConsumer<FavoritemoviesBloc, FavoritemoviesState>(
+      listener: (context, state) {
+        if (state is OnDeleteSuccess) {
+          Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text('Deleted'),
+          ));
+        }
+      },
+      builder: (context, state) {
+        if (state is FavoriteMovieLists) {
+          _listMovies = state.favoriteMovieLists;
           return ListMoviesFavorite(_listMovies, _deleteMovie);
         } else {
           return _buildProgressBar();
         }
       },
     );
+    // return FutureBuilder(
+    //   future: wsMovieRDS.getAllMovies(),
+    //   builder:
+    //       (BuildContext context, AsyncSnapshot<List<WsMovieModel>> snapshot) {
+    //     if (snapshot.connectionState == ConnectionState.done &&
+    //         !snapshot.hasError) {
+    //       // List<WsMovieModel> lis = List<WsMovieModel>();
+    //       _listMovies = snapshot.data;
+    //       // lis.add(_listMoviesRecomendation);
+    //       return ListMoviesFavorite(_listMovies, _deleteMovie);
+    //     } else {
+    //       return _buildProgressBar();
+    //     }
+    //   },
+    // );
   }
 }

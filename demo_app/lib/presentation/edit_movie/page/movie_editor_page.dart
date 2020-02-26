@@ -1,29 +1,38 @@
+import 'dart:convert';
+
+import 'package:demo_app/common/configure/getit_configuration.dart';
 import 'package:demo_app/data/ws/datasources/ws_remote_datasource.dart';
 import 'package:demo_app/data/ws/models/ws_movie_model.dart';
 import 'package:demo_app/domain/entities/movies.dart';
-import 'package:demo_app/presentation/edit_favorite_movie/bloc/favoritedetail_bloc.dart';
+import 'package:demo_app/domain/search/use_cases/search_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 
-class FavoriteDetailMoviePage extends StatefulWidget {
+import 'bloc/movieeditor_bloc.dart';
+
+class MovieEditorPage extends StatefulWidget {
   final Movie movie;
-  FavoriteDetailMoviePage({this.movie});
+  // final Function _function;
+  MovieEditorPage({this.movie});
 
   @override
-  _FavoriteDetailMoviePageState createState() =>
-      _FavoriteDetailMoviePageState();
+  _MovieEditorPageState createState() => _MovieEditorPageState(movie);
 }
 
-class _FavoriteDetailMoviePageState extends State<FavoriteDetailMoviePage> {
+class _MovieEditorPageState extends State<MovieEditorPage> {
   bool switchOn;
-  Movie _movie;
+  Movie movie;
   String _now;
   DateTime _date;
   final _formKey = GlobalKey<FormState>();
 
+  // LikeMovieUseCase likeMovieUseCase = getIt<LikeMovieUseCase>();
+
   TextEditingController yearController = TextEditingController();
+
+  _MovieEditorPageState(this.movie);
 
   WsMovieRemoteDatasourceImpl get wsMovieRDS =>
       WsMovieRemoteDatasourceImpl.create();
@@ -32,35 +41,36 @@ class _FavoriteDetailMoviePageState extends State<FavoriteDetailMoviePage> {
   void initState() {
     super.initState();
     DateTime _temp =
-        DateTime.fromMillisecondsSinceEpoch(widget.movie.timestamp);
+        DateTime.fromMillisecondsSinceEpoch(widget.movie.timestamp ?? 0);
     // var formatter = new DateFormat('yyyy-MM-dd');
     _now = DateFormat.yMMMd().format(_temp);
-    _movie = _movie.copyWith(widget.movie);
+    // movie = widget.movie ?? null;
     switchOn = widget.movie.viewed;
   }
 
   void _changeViewed(bool value) {
     setState(() {
       switchOn = value;
-      _movie = _movie.copyWith(Movie(viewed: value));
+      movie = movie.copyWith(Movie(viewed: value));
     });
   }
 
-  Future<void> _submitForm() {
+  void _submitForm() {
     WsMovieModel wsMovieModel = WsMovieModel(
-      id: _movie.id,
-      label: _movie.label,
-      poster: _movie.poster,
-      priority: _movie.priority,
-      rating: _movie.rating,
-      timestamp: _movie.timestamp,
-      title: _movie.title,
-      type: _movie.type,
-      viewed: _movie.viewed,
-      year: _movie.year,
+      id: movie.id,
+      label: movie.label,
+      poster: movie.poster,
+      priority: movie.priority,
+      rating: movie.rating,
+      timestamp: movie.timestamp,
+      title: movie.title,
+      type: movie.type,
+      viewed: movie.viewed,
+      year: movie.year,
     );
-    BlocProvider.of<FavoritedetailBloc>(context)
-        .add(UpdateMovieEvent(favoriteMovie: wsMovieModel));
+
+    BlocProvider.of<MovieeditorBloc>(context)
+        .add(LikeMovieEvent(favoriteMovie: wsMovieModel));
   }
 
   Widget _checkPoster(Movie movie) {
@@ -105,11 +115,10 @@ class _FavoriteDetailMoviePageState extends State<FavoriteDetailMoviePage> {
                               child: TextFormField(
                                 onChanged: (value) {
                                   setState(() {
-                                    _movie =
-                                        _movie.copyWith(Movie(title: value));
+                                    movie = movie.copyWith(Movie(title: value));
                                   });
                                 },
-                                initialValue: _movie.title,
+                                initialValue: movie.title,
                                 style: Theme.of(context).textTheme.title,
                                 decoration: const InputDecoration(
                                   labelText: "Title",
@@ -126,8 +135,7 @@ class _FavoriteDetailMoviePageState extends State<FavoriteDetailMoviePage> {
                               child: TextFormField(
                                 onChanged: (value) {
                                   setState(() {
-                                    _movie =
-                                        _movie.copyWith(Movie(year: value));
+                                    movie = movie.copyWith(Movie(year: value));
                                   });
                                 },
                                 initialValue: widget.movie.year,
@@ -147,8 +155,7 @@ class _FavoriteDetailMoviePageState extends State<FavoriteDetailMoviePage> {
                               child: TextFormField(
                                 onChanged: (value) {
                                   setState(() {
-                                    _movie =
-                                        _movie.copyWith(Movie(label: value));
+                                    movie = movie.copyWith(Movie(label: value));
                                   });
                                 },
                                 initialValue: widget.movie.label,
@@ -185,12 +192,12 @@ class _FavoriteDetailMoviePageState extends State<FavoriteDetailMoviePage> {
                           allowHalfRating: false,
                           onRatingChanged: (value) {
                             setState(() {
-                              _movie =
-                                  _movie.copyWith(Movie(rating: value.toInt()));
+                              movie =
+                                  movie.copyWith(Movie(rating: value.toInt()));
                             });
                           },
                           starCount: 5,
-                          rating: _movie.rating.toDouble(),
+                          rating: (movie.rating ?? 0).toDouble(),
                           size: 40.0,
                           filledIconData: Icons.blur_off,
                           halfFilledIconData: Icons.blur_on,
@@ -211,11 +218,11 @@ class _FavoriteDetailMoviePageState extends State<FavoriteDetailMoviePage> {
                           },
                           onChanged: (value) {
                             setState(() {
-                              _movie = _movie
+                              movie = movie
                                   .copyWith(Movie(priority: int.parse(value)));
                             });
                           },
-                          initialValue: widget.movie.priority.toString(),
+                          initialValue: (widget.movie.priority ?? 0).toString(),
                           style: Theme.of(context).textTheme.title,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
@@ -232,7 +239,7 @@ class _FavoriteDetailMoviePageState extends State<FavoriteDetailMoviePage> {
                         child: SwitchListTile(
                           title: Text('Viewed',
                               style: Theme.of(context).textTheme.title),
-                          value: switchOn,
+                          value: switchOn ?? false,
                           onChanged: (value) {
                             _changeViewed(value);
                           },
@@ -253,9 +260,10 @@ class _FavoriteDetailMoviePageState extends State<FavoriteDetailMoviePage> {
                       final form = _formKey.currentState;
                       if (form.validate()) {
                         form.save();
-                        _movie = _movie.copyWith(Movie(
+                        movie = movie.copyWith(Movie(
                             timestamp: DateTime.now().millisecondsSinceEpoch));
                         _submitForm();
+
                         Navigator.pop(context);
                       }
                     },

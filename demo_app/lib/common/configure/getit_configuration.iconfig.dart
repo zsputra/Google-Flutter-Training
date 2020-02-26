@@ -12,6 +12,11 @@ import 'package:demo_app/data/ws/datasources/ws_remote_datasource.dart';
 import 'package:demo_app/data/ws/repository/ws_repository.dart';
 import 'package:demo_app/domain/search/use_cases/search_use_case.dart';
 import 'package:demo_app/presentation/search/bloc/bloc/search_movie_bloc_bloc.dart';
+import 'package:demo_app/domain/edit_movie/use_cases/edit_movie_use_case.dart';
+import 'package:demo_app/presentation/edit_movie/page/bloc/movieeditor_bloc.dart';
+import 'package:demo_app/presentation/edit_favorite_movie/bloc/favoritedetail_bloc.dart';
+import 'package:demo_app/presentation/favorite_movies/bloc/favoritemovies_bloc.dart';
+import 'package:demo_app/presentation/favorite_movies/use_cases/favorite_movie_use_cases.dart';
 import 'package:get_it/get_it.dart';
 
 final getIt = GetIt.instance;
@@ -38,5 +43,14 @@ void $initGetIt({String environment}) {
         () => WsRepositoryImpl(datasource: getIt<WsMovieRemoteDatasource>()))
     ..registerLazySingleton<GetAllMoviesByTitle>(
         () => GetAllMoviesByTitle(omdbRepository: getIt<OmdbRepository>()))
-    ..registerFactory<SearchMovieBlocBloc>(() => SearchMovieBlocBloc());
+    ..registerFactory<SearchMovieBlocBloc>(() => SearchMovieBlocBloc())
+    ..registerLazySingleton<LikeMovieUseCase>(
+        () => LikeMovieUseCase(wsRepository: getIt<WsRepository>()))
+    ..registerLazySingleton<UpdateMoveCase>(
+        () => UpdateMoveCase(wsRepository: getIt<WsRepository>()))
+    ..registerFactory<MovieeditorBloc>(() => MovieeditorBloc())
+    ..registerFactory<FavoritedetailBloc>(() => FavoritedetailBloc())
+    ..registerFactory<FavoritemoviesBloc>(() => FavoritemoviesBloc())
+    ..registerLazySingleton<GetAllFavoriteMovieUseCase>(() => GetAllFavoriteMovieUseCase(wsRepository: getIt<WsRepository>()))
+    ..registerLazySingleton<DeleteFavoriteMovieById>(() => DeleteFavoriteMovieById(wsRepository: getIt<WsRepository>()));
 }

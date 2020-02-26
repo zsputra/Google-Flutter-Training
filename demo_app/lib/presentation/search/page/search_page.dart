@@ -24,13 +24,15 @@ class _SearchPageImpl extends State<SearchPage> {
   List<Movie> _listMovies = new List<Movie>();
   String _title;
   String _year;
+  TextEditingController _yearController = TextEditingController();
+  TextEditingController _titleController = TextEditingController();
 
   final WsMovieRemoteDatasource wsMovieRDS = getIt<WsMovieRemoteDatasource>();
 
   final GetAllMoviesByTitle getAllMoviesByTitle = getIt<GetAllMoviesByTitle>();
 
-  final OmdbMovieRemoteDatasource omdbMovieRDS = getIt<OmdbMovieRemoteDatasource>();
- 
+  final OmdbMovieRemoteDatasource omdbMovieRDS =
+      getIt<OmdbMovieRemoteDatasource>();
 
   TextEditingController controller = TextEditingController();
   Future<OmdbRepository> get omdbRepository async => OmdbRepositoryImpl(
@@ -42,20 +44,20 @@ class _SearchPageImpl extends State<SearchPage> {
   @override
   void initState() {
     _title = 'Ave';
+    // _yearController =
     // _getData();
     BlocProvider.of<SearchMovieBlocBloc>(context)
-        .add(SearchMovieByTitleYear({'title' : 'Ave', 'year' : null}));
+        .add(SearchMovieByTitleYear({'title': 'Ave', 'year': null}));
     super.initState();
   }
 
-  void _initDataList(){
-
-  }
+  void _initDataList() {}
 
   void _getData() async {
     try {
       // final repository = await omdbRepository;
-      final list = await getAllMoviesByTitle.call({'title': _title, 'year' : null});
+      final list =
+          await getAllMoviesByTitle.call({'title': _title, 'year': null});
 
       if (mounted) {
         setState(() {
@@ -72,7 +74,6 @@ class _SearchPageImpl extends State<SearchPage> {
     }
   }
 
-
   Widget _buildProgressBar() {
     return Center(child: CircularProgressIndicator());
   }
@@ -86,17 +87,28 @@ class _SearchPageImpl extends State<SearchPage> {
 
   void filterSearchResultByYear(String year) {
     setState(() {
-      // _title = title;
       _year = year;
     });
   }
 
-  void _addToMovieList(Movie movieDetail)async {
+  void _addToMovieList(Movie movieDetail) async {
     final repository = wsMovieRDS;
-    setState(()  {
-      WsMovieModel wsMovieModel = new WsMovieModel(id: movieDetail.id, poster: movieDetail.poster, year: movieDetail.year, title: movieDetail.title, type: movieDetail.type);
+    setState(() {
+      WsMovieModel wsMovieModel = new WsMovieModel(
+          id: movieDetail.id,
+          poster: movieDetail.poster,
+          year: movieDetail.year,
+          title: movieDetail.title,
+          type: movieDetail.type);
       repository.postMovie(wsMovieModel);
     });
+  }
+
+  void _search() {
+    BlocProvider.of<SearchMovieBlocBloc>(context).add(SearchMovieByTitleYear(
+        {'title': _titleController.text, 'year': _yearController.text}));
+    // BlocProvider.of<SearchMovieBlocBloc>(context)
+    //     .add(SearchMovieByTitleYear({'title': _title, 'year': _year}));
   }
 
   @override
@@ -134,15 +146,16 @@ class _SearchPageImpl extends State<SearchPage> {
                           child: Container(
                             padding: EdgeInsets.all(5.0),
                             child: TextField(
+                              controller: _titleController,
                               decoration: const InputDecoration(
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(8.0))),
                                   labelText: "Title"),
                               style: Theme.of(context).textTheme.body1,
-                              onChanged: (value) {
-                                filterSearchResultByTitle(value);
-                              },
+                              // onChanged: (value) {
+                              //   filterSearchResultByTitle(value);
+                              // },
                             ),
                           ),
                         ),
@@ -153,6 +166,7 @@ class _SearchPageImpl extends State<SearchPage> {
                           child: Container(
                             padding: EdgeInsets.all(5.0),
                             child: TextField(
+                              controller: _yearController,
                               keyboardType: TextInputType.number,
                               decoration: const InputDecoration(
                                   border: OutlineInputBorder(
@@ -160,9 +174,9 @@ class _SearchPageImpl extends State<SearchPage> {
                                           Radius.circular(8.0))),
                                   labelText: "Year"),
                               style: Theme.of(context).textTheme.body1,
-                              onChanged: (value) {
-                                filterSearchResultByYear(value);
-                              },
+                              // onChanged: (value) {
+                              //   filterSearchResultByYear(value);
+                              // },
                             ),
                           ),
                         ),
@@ -171,7 +185,7 @@ class _SearchPageImpl extends State<SearchPage> {
                         ),
                         IconButton(
                           icon: Icon(Icons.search),
-                          onPressed: () {},
+                          onPressed: _search,
                         )
                       ],
                     ),
@@ -185,15 +199,16 @@ class _SearchPageImpl extends State<SearchPage> {
   }
 
   Widget listMovie() {
-    return BlocBuilder<SearchMovieBlocBloc, SearchMovieBlocState>( 
-        builder: (context, state){
-          if(state is SearchMovieByTitleYearState){
-            _listMovies = state.searchMovieLists;
-            return ListMovies(_listMovies, _addToMovieList);
-          } else {
-            return const SizedBox.shrink();
-          }
+    return BlocBuilder<SearchMovieBlocBloc, SearchMovieBlocState>(
+      builder: (context, state) {
+        if (state is SearchMovieByTitleYearState) {
+          _listMovies = state.searchMovieLists;
+          return ListMovies(_listMovies, _addToMovieList);
+        } else {
+          return _buildProgressBar();
+          // return const SizedBox.shrink();
         }
-    ,);
+      },
+    );
   }
 }
